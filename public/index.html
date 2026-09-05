@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#ffffff">
   <title>Adnova Code</title>
   <link rel="stylesheet" href="/css/app.css">
@@ -10,163 +10,254 @@
 
 <body>
 
-<div class="shell">
+<div id="app-shell" class="app-shell">
 
   <aside class="sidebar">
 
-    <div class="brand">
-      <div class="brand-mark">A</div>
-      <div>
+    <div class="sidebar-brand">
+      <div class="brand-icon">A</div>
+
+      <div class="brand-text">
         <strong>Adnova</strong>
         <span>Code</span>
       </div>
     </div>
 
-    <button class="profile-card" id="profile-button">
-      <div class="profile-avatar">H</div>
-      <div class="profile-info">
+    <button class="profile-button" id="profile-button">
+      <div class="avatar">H</div>
+
+      <div class="profile-copy">
         <strong id="profile-name">Your Profile</strong>
-        <span>@you</span>
+        <span id="profile-handle">@you</span>
       </div>
-      <span class="profile-chevron">›</span>
+
+      <span class="chevron">›</span>
     </button>
 
-    <button class="new-repository-button" id="create-repository-button">
+    <button
+      class="create-button"
+      id="create-repository-button"
+    >
       <span>＋</span>
-      New repository
+      <span>New repository</span>
     </button>
 
-    <nav class="main-nav">
+    <nav class="sidebar-nav">
 
-      <button class="nav-item active" data-page="overview">
-        <span>⌂</span>
-        Overview
+      <button
+        class="nav-link active"
+        data-page="home"
+      >
+        <span class="nav-icon">⌂</span>
+        <span>Home</span>
       </button>
 
-      <button class="nav-item" data-page="repositories">
-        <span>◫</span>
-        Repositories
+      <button
+        class="nav-link"
+        data-page="repositories"
+      >
+        <span class="nav-icon">▣</span>
+        <span>Repositories</span>
       </button>
 
-      <button class="nav-item" data-page="codespaces">
-        <span>▣</span>
-        Codespaces
+      <button
+        class="nav-link"
+        data-page="codespaces"
+      >
+        <span class="nav-icon">▤</span>
+        <span>Codespaces</span>
       </button>
 
-      <button class="nav-item" data-page="branches">
-        <span>⑂</span>
-        Branches
+      <button
+        class="nav-link"
+        data-page="branches"
+      >
+        <span class="nav-icon">⑂</span>
+        <span>Branches</span>
       </button>
 
     </nav>
 
-    <div class="sidebar-section-title">
-      YOUR WORK
+    <div class="sidebar-label">
+      YOUR REPOSITORIES
     </div>
 
-    <div id="repository-list" class="repository-list">
-      <div class="empty-list">
-        No repositories yet.
-      </div>
-    </div>
+    <div
+      id="sidebar-repositories"
+      class="sidebar-repositories"
+    ></div>
 
-    <div class="sidebar-bottom">
+    <div class="sidebar-spacer"></div>
 
-      <button class="nav-item" data-page="settings">
-        <span>⚙</span>
-        Settings
-      </button>
+    <button
+      class="nav-link"
+      data-page="settings"
+    >
+      <span class="nav-icon">⚙</span>
+      <span>Settings</span>
+    </button>
 
-      <button class="nav-item" data-page="plugins">
-        <span>◇</span>
-        Plugins
-      </button>
-
-    </div>
+    <button
+      class="nav-link"
+      data-page="plugins"
+    >
+      <span class="nav-icon">◇</span>
+      <span>Plugins</span>
+    </button>
 
   </aside>
 
-  <main class="content">
+
+  <main class="main-area">
 
     <header class="topbar">
 
       <div class="topbar-left">
-        <button id="mobile-menu-button" class="icon-button">☰</button>
-        <div id="page-breadcrumb">Overview</div>
+
+        <button
+          class="mobile-menu-button"
+          id="mobile-menu-button"
+        >
+          ☰
+        </button>
+
+        <div
+          id="breadcrumb"
+          class="breadcrumb"
+        >
+          Home
+        </div>
+
       </div>
 
       <div class="topbar-right">
-        <span id="connection-indicator" class="connection-indicator">
-          ● Connected
-        </span>
 
-        <button id="top-profile-button" class="top-profile">
-          <span class="profile-avatar small">H</span>
+        <div class="connection-status">
+          <span class="status-dot"></span>
+          Connected
+        </div>
+
+        <button
+          class="top-avatar"
+          id="top-avatar-button"
+        >
+          H
         </button>
+
       </div>
 
     </header>
 
-    <div id="page-root" class="page-root"></div>
+
+    <main
+      id="page-root"
+      class="page-root"
+    ></main>
 
   </main>
 
 </div>
 
 
-<div id="repository-modal" class="modal hidden">
+<!-- REPOSITORY MODAL -->
+
+<div
+  id="repository-modal"
+  class="modal hidden"
+>
 
   <div class="modal-card">
 
     <div class="modal-header">
+
       <div>
-        <div class="modal-eyebrow">NEW REPOSITORY</div>
+        <div class="modal-label">
+          NEW REPOSITORY
+        </div>
+
         <h2>Create repository</h2>
       </div>
 
-      <button id="close-repository-modal" class="close-button">
+      <button
+        id="close-modal"
+        class="close-modal"
+      >
         ×
       </button>
+
     </div>
 
-    <label>
-      Repository name
+
+    <label class="form-field">
+
+      <span>Repository name</span>
+
       <input
-        id="repository-name-input"
-        type="text"
+        id="repository-name"
         placeholder="my-project"
         autocomplete="off"
       >
+
     </label>
 
-    <label>
-      Description
+
+    <label class="form-field">
+
+      <span>Description</span>
+
       <input
-        id="repository-description-input"
-        type="text"
-        placeholder="What is this project?"
+        id="repository-description"
+        placeholder="What are you building?"
+        autocomplete="off"
       >
+
     </label>
 
-    <label class="checkbox-label">
-      <input id="repository-readme-input" type="checkbox" checked>
-      <span>Add a README file</span>
+
+    <label class="checkbox-field">
+
+      <input
+        id="repository-readme"
+        type="checkbox"
+        checked
+      >
+
+      <span>
+        Add a README
+      </span>
+
     </label>
 
-    <label>
-      Visibility
-      <select id="repository-visibility-input">
-        <option value="public">Public</option>
-        <option value="private">Private</option>
+
+    <label class="form-field">
+
+      <span>Visibility</span>
+
+      <select id="repository-visibility">
+
+        <option value="public">
+          Public
+        </option>
+
+        <option value="private">
+          Private
+        </option>
+
       </select>
+
     </label>
 
-    <div class="modal-note">
-      Public repositories can be viewed by other users.
-      Private repositories stay visible only to people with access.
+
+    <div class="visibility-info">
+      Public repositories can be viewed by anyone.
+      Private repositories remain private.
     </div>
 
-    <button id="confirm-repository-button" class="primary-button">
+
+    <button
+      id="create-repository-confirm"
+      class="modal-primary-button"
+    >
       Create repository
     </button>
 
@@ -175,7 +266,11 @@
 </div>
 
 
-<div id="toast" class="toast hidden"></div>
+<div
+  id="toast"
+  class="toast hidden"
+></div>
+
 
 <script src="/js/app.js"></script>
 
