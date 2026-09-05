@@ -21,23 +21,26 @@ app.use(
 );
 
 app.use(express.json({ limit: "25mb" }));
-app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, "..", "public")));
+app.use(
+  express.static(
+    path.join(__dirname, "..", "public")
+  )
+);
 
 app.get("/api/health", (req, res) => {
   res.json({
     name: "Adnova Code",
     status: "online",
-    version: "1.0.0"
+    version: "1.1.0"
   });
 });
 
 app.get("/api/plugin/health", (req, res) => {
   res.json({
     plugin: "Adnova Coding",
-    status: "online",
     service: "Adnova Code",
+    status: "online",
     protocol: "1.0"
   });
 });
@@ -50,7 +53,10 @@ app.post("/api/plugin/prompt", (req, res) => {
     attachments = []
   } = req.body || {};
 
-  if (typeof prompt !== "string" || !prompt.trim()) {
+  if (
+    typeof prompt !== "string" ||
+    !prompt.trim()
+  ) {
     return res.status(400).json({
       ok: false,
       error: "Prompt is required."
@@ -91,10 +97,17 @@ app.post("/api/plugin/context", (req, res) => {
 
 app.get("/{*splat}", (req, res) => {
   res.sendFile(
-    path.join(__dirname, "..", "public", "index.html")
+    path.join(
+      __dirname,
+      "..",
+      "public",
+      "index.html"
+    )
   );
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Adnova Code running on port ${PORT}`);
+  console.log(
+    `🚀 Adnova Code running on port ${PORT}`
+  );
 });

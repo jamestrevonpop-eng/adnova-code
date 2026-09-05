@@ -2,169 +2,182 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
   <title>Adnova Code</title>
   <link rel="stylesheet" href="/css/app.css">
 </head>
 
 <body>
-  <div class="app">
 
-    <aside class="sidebar">
-      <div class="brand">
-        <span>Adnova</span>
-        <strong>Code</strong>
+<div class="shell">
+
+  <aside class="sidebar">
+
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div>
+        <strong>Adnova</strong>
+        <span>Code</span>
       </div>
+    </div>
 
-      <button class="new-project" id="create-repository">
-        + New repository
+    <button class="profile-card" id="profile-button">
+      <div class="profile-avatar">H</div>
+      <div class="profile-info">
+        <strong id="profile-name">Your Profile</strong>
+        <span>@you</span>
+      </div>
+      <span class="profile-chevron">›</span>
+    </button>
+
+    <button class="new-repository-button" id="create-repository-button">
+      <span>＋</span>
+      New repository
+    </button>
+
+    <nav class="main-nav">
+
+      <button class="nav-item active" data-page="overview">
+        <span>⌂</span>
+        Overview
       </button>
 
-      <div class="sidebar-title">WORKSPACE</div>
+      <button class="nav-item" data-page="repositories">
+        <span>◫</span>
+        Repositories
+      </button>
 
-      <button class="sidebar-item active">Explorer</button>
-      <button class="sidebar-item">Branches</button>
-      <button class="sidebar-item">Snapshots</button>
+      <button class="nav-item" data-page="codespaces">
+        <span>▣</span>
+        Codespaces
+      </button>
 
-      <div class="sidebar-title">PROJECTS</div>
+      <button class="nav-item" data-page="branches">
+        <span>⑂</span>
+        Branches
+      </button>
 
-      <div id="project-list" class="project-list">
-        <div class="empty-projects">No repositories yet.</div>
+    </nav>
+
+    <div class="sidebar-section-title">
+      YOUR WORK
+    </div>
+
+    <div id="repository-list" class="repository-list">
+      <div class="empty-list">
+        No repositories yet.
       </div>
-    </aside>
+    </div>
 
-    <main class="main">
+    <div class="sidebar-bottom">
 
-      <header class="topbar">
-        <div class="topbar-left">
-          <strong id="repository-name">No repository selected</strong>
-          <span id="branch-name">main</span>
-        </div>
+      <button class="nav-item" data-page="settings">
+        <span>⚙</span>
+        Settings
+      </button>
 
-        <div class="topbar-actions">
-          <button id="preview-button">Preview</button>
-          <button id="snapshot-button">Snapshot</button>
-          <button id="save-button">Save</button>
-        </div>
-      </header>
-
-      <section class="editor-layout">
-
-        <div class="explorer">
-          <div class="panel-title">EXPLORER</div>
-          <div id="file-tree" class="file-tree">
-            <div class="empty-files">Create a repository to begin.</div>
-          </div>
-        </div>
-
-        <div class="editor">
-          <div class="editor-tab">
-            <span id="current-file">Welcome</span>
-          </div>
-
-          <div id="editor-content" class="editor-content">
-            <div class="welcome">
-              <div class="eyebrow">ADNOVA CODE</div>
-              <h1>Build something.</h1>
-              <p>
-                Create a repository, open a Codespace,
-                work with files and use Adnova Coding alongside it.
-              </p>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-      <section class="terminal">
-        <div class="terminal-header">
-          <strong>Terminal</strong>
-          <span>/projects</span>
-        </div>
-
-        <div id="terminal-output" class="terminal-output">
-          <div>Adnova Code terminal</div>
-          <div>Workspace: /projects</div>
-        </div>
-
-        <div class="terminal-input">
-          <span>&gt;</span>
-          <input
-            id="terminal-command"
-            autocomplete="off"
-            spellcheck="false"
-            placeholder="Type a command..."
-          >
-        </div>
-      </section>
-
-    </main>
-
-    <aside class="coding-ai">
-
-      <div class="ai-header">
-        <div>
-          <strong>Adnova Coding</strong>
-          <span>Plugin connected</span>
-        </div>
-      </div>
-
-      <div id="ai-messages" class="ai-messages">
-        <div class="ai-message">
-          Tell Adnova Coding what you want to build,
-          change or debug.
-        </div>
-      </div>
-
-      <div class="ai-composer">
-        <textarea
-          id="ai-input"
-          rows="3"
-          placeholder="Ask Adnova Coding..."
-        ></textarea>
-
-        <button id="ai-send" aria-label="Send">
-          ↑
-        </button>
-      </div>
-
-    </aside>
-
-  </div>
-
-  <div id="repository-modal" class="modal hidden">
-    <div class="modal-card">
-
-      <div class="modal-header">
-        <strong>Create repository</strong>
-        <button id="close-modal">×</button>
-      </div>
-
-      <label>
-        Repository name
-        <input id="repo-name" placeholder="my-project">
-      </label>
-
-      <label class="checkbox-row">
-        <input id="repo-readme" type="checkbox" checked>
-        <span>Add README</span>
-      </label>
-
-      <label>
-        Visibility
-        <select id="repo-visibility">
-          <option value="public">Public</option>
-          <option value="private">Private</option>
-        </select>
-      </label>
-
-      <button id="create-repo-confirm">
-        Create repository
+      <button class="nav-item" data-page="plugins">
+        <span>◇</span>
+        Plugins
       </button>
 
     </div>
+
+  </aside>
+
+  <main class="content">
+
+    <header class="topbar">
+
+      <div class="topbar-left">
+        <button id="mobile-menu-button" class="icon-button">☰</button>
+        <div id="page-breadcrumb">Overview</div>
+      </div>
+
+      <div class="topbar-right">
+        <span id="connection-indicator" class="connection-indicator">
+          ● Connected
+        </span>
+
+        <button id="top-profile-button" class="top-profile">
+          <span class="profile-avatar small">H</span>
+        </button>
+      </div>
+
+    </header>
+
+    <div id="page-root" class="page-root"></div>
+
+  </main>
+
+</div>
+
+
+<div id="repository-modal" class="modal hidden">
+
+  <div class="modal-card">
+
+    <div class="modal-header">
+      <div>
+        <div class="modal-eyebrow">NEW REPOSITORY</div>
+        <h2>Create repository</h2>
+      </div>
+
+      <button id="close-repository-modal" class="close-button">
+        ×
+      </button>
+    </div>
+
+    <label>
+      Repository name
+      <input
+        id="repository-name-input"
+        type="text"
+        placeholder="my-project"
+        autocomplete="off"
+      >
+    </label>
+
+    <label>
+      Description
+      <input
+        id="repository-description-input"
+        type="text"
+        placeholder="What is this project?"
+      >
+    </label>
+
+    <label class="checkbox-label">
+      <input id="repository-readme-input" type="checkbox" checked>
+      <span>Add a README file</span>
+    </label>
+
+    <label>
+      Visibility
+      <select id="repository-visibility-input">
+        <option value="public">Public</option>
+        <option value="private">Private</option>
+      </select>
+    </label>
+
+    <div class="modal-note">
+      Public repositories can be viewed by other users.
+      Private repositories stay visible only to people with access.
+    </div>
+
+    <button id="confirm-repository-button" class="primary-button">
+      Create repository
+    </button>
+
   </div>
 
-  <script src="/js/app.js"></script>
+</div>
+
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="/js/app.js"></script>
+
 </body>
 </html>
