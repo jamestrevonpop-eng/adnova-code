@@ -1,0 +1,19 @@
+{
+  "id": "adnova-coding",
+  "name": "Adnova Coding",
+  "version": "1.0.0",
+  "service": "Adnova Code",
+  "protocol": "1.0",
+  "endpoint": "/api/plugin",
+  "capabilities": [
+    "health",
+    "prompt",
+    "context",
+    "attachments",
+    "repository",
+    "branches",
+    "snapshots",
+    "terminal",
+    "preview"
+  ]
+}
