@@ -23,16 +23,29 @@
       </div>
     </div>
 
+
     <button class="profile-button" id="profile-button">
+
       <div class="avatar">H</div>
 
       <div class="profile-copy">
-        <strong id="profile-name">Your Profile</strong>
-        <span id="profile-handle">@you</span>
+
+        <strong>
+          Your Profile
+        </strong>
+
+        <span>
+          @you
+        </span>
+
       </div>
 
-      <span class="chevron">›</span>
+      <span class="chevron">
+        ›
+      </span>
+
     </button>
+
 
     <button
       class="create-button"
@@ -41,6 +54,7 @@
       <span>＋</span>
       <span>New repository</span>
     </button>
+
 
     <nav class="sidebar-nav">
 
@@ -52,6 +66,7 @@
         <span>Home</span>
       </button>
 
+
       <button
         class="nav-link"
         data-page="repositories"
@@ -60,6 +75,7 @@
         <span>Repositories</span>
       </button>
 
+
       <button
         class="nav-link"
         data-page="codespaces"
@@ -67,6 +83,7 @@
         <span class="nav-icon">▤</span>
         <span>Codespaces</span>
       </button>
+
 
       <button
         class="nav-link"
@@ -78,16 +95,20 @@
 
     </nav>
 
+
     <div class="sidebar-label">
       YOUR REPOSITORIES
     </div>
+
 
     <div
       id="sidebar-repositories"
       class="sidebar-repositories"
     ></div>
 
+
     <div class="sidebar-spacer"></div>
+
 
     <button
       class="nav-link"
@@ -96,6 +117,7 @@
       <span class="nav-icon">⚙</span>
       <span>Settings</span>
     </button>
+
 
     <button
       class="nav-link"
@@ -130,12 +152,14 @@
 
       </div>
 
+
       <div class="topbar-right">
 
         <div class="connection-status">
           <span class="status-dot"></span>
-          Connected
+          Adnova Code
         </div>
+
 
         <button
           class="top-avatar"
@@ -159,8 +183,6 @@
 </div>
 
 
-<!-- REPOSITORY MODAL -->
-
 <div
   id="repository-modal"
   class="modal hidden"
@@ -171,12 +193,17 @@
     <div class="modal-header">
 
       <div>
+
         <div class="modal-label">
           NEW REPOSITORY
         </div>
 
-        <h2>Create repository</h2>
+        <h2>
+          Create repository
+        </h2>
+
       </div>
+
 
       <button
         id="close-modal"
@@ -190,7 +217,9 @@
 
     <label class="form-field">
 
-      <span>Repository name</span>
+      <span>
+        Repository name
+      </span>
 
       <input
         id="repository-name"
@@ -203,7 +232,9 @@
 
     <label class="form-field">
 
-      <span>Description</span>
+      <span>
+        Description
+      </span>
 
       <input
         id="repository-description"
@@ -231,9 +262,13 @@
 
     <label class="form-field">
 
-      <span>Visibility</span>
+      <span>
+        Visibility
+      </span>
 
-      <select id="repository-visibility">
+      <select
+        id="repository-visibility"
+      >
 
         <option value="public">
           Public
@@ -249,8 +284,10 @@
 
 
     <div class="visibility-info">
+
       Public repositories can be viewed by anyone.
       Private repositories remain private.
+
     </div>
 
 
@@ -260,6 +297,239 @@
     >
       Create repository
     </button>
+
+  </div>
+
+</div>
+
+
+<div
+  id="plugin-consent"
+  class="plugin-consent hidden"
+>
+
+  <div class="plugin-consent-card">
+
+    <div class="plugin-consent-header">
+
+      <div>
+
+        <div class="plugin-consent-label">
+          PLUGIN CONNECTION
+        </div>
+
+        <h2>
+          Connect Adnova Coding
+        </h2>
+
+      </div>
+
+
+      <button
+        class="close-modal"
+        id="close-plugin-consent"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="plugin-identity">
+
+      <div class="plugin-large-icon">
+        A
+      </div>
+
+      <div>
+
+        <strong>
+          Adnova Coding
+        </strong>
+
+        <span>
+          Adnova AI ↔ Adnova Code
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <p class="plugin-consent-description">
+      Choose what Adnova AI is allowed to do
+      inside your Adnova Code workspace.
+    </p>
+
+
+    <div class="permission-list">
+
+      <label class="permission">
+
+        <input
+          type="checkbox"
+          data-permission="observe"
+          checked
+          disabled
+        >
+
+        <span class="permission-copy">
+
+          <strong>
+            Observe code
+          </strong>
+
+          <small>
+            Read files and inspect project context.
+          </small>
+
+        </span>
+
+        <span class="required-pill">
+          Required
+        </span>
+
+      </label>
+
+
+      <label class="permission">
+
+        <input
+          type="checkbox"
+          data-permission="edit"
+        >
+
+        <span class="permission-copy">
+
+          <strong>
+            Change code
+          </strong>
+
+          <small>
+            Modify existing project files.
+          </small>
+
+        </span>
+
+      </label>
+
+
+      <label class="permission">
+
+        <input
+          type="checkbox"
+          data-permission="create"
+        >
+
+        <span class="permission-copy">
+
+          <strong>
+            Create files
+          </strong>
+
+          <small>
+            Add new files and folders.
+          </small>
+
+        </span>
+
+      </label>
+
+
+      <label class="permission">
+
+        <input
+          type="checkbox"
+          data-permission="terminal"
+        >
+
+        <span class="permission-copy">
+
+          <strong>
+            Use terminal
+          </strong>
+
+          <small>
+            Run approved terminal commands.
+          </small>
+
+        </span>
+
+      </label>
+
+
+      <label class="permission">
+
+        <input
+          type="checkbox"
+          data-permission="branches"
+        >
+
+        <span class="permission-copy">
+
+          <strong>
+            Manage branches
+          </strong>
+
+          <small>
+            Create and work with project branches.
+          </small>
+
+        </span>
+
+      </label>
+
+
+      <label class="permission">
+
+        <input
+          type="checkbox"
+          data-permission="snapshots"
+        >
+
+        <span class="permission-copy">
+
+          <strong>
+            Manage snapshots
+          </strong>
+
+          <small>
+            Create and restore workspace snapshots.
+          </small>
+
+        </span>
+
+      </label>
+
+    </div>
+
+
+    <div class="plugin-consent-warning">
+
+      You can change these permissions later
+      from Plugin management.
+
+    </div>
+
+
+    <div class="plugin-consent-actions">
+
+      <button
+        class="secondary-button"
+        id="cancel-plugin-consent"
+      >
+        Cancel
+      </button>
+
+
+      <button
+        class="primary-button"
+        id="allow-plugin"
+      >
+        Allow access
+      </button>
+
+    </div>
 
   </div>
 

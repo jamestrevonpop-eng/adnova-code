@@ -4,26 +4,40 @@ const state = {
 
   repositories: JSON.parse(
     localStorage.getItem(
-      "adnova-code-repositories-v2"
+      "adnova-code-repositories-v3"
     ) || "[]"
   ),
 
   codespaces: JSON.parse(
     localStorage.getItem(
-      "adnova-code-codespaces-v2"
+      "adnova-code-codespaces-v3"
     ) || "[]"
   ),
 
-  profile: JSON.parse(
+  pluginConnection: JSON.parse(
     localStorage.getItem(
-      "adnova-code-profile-v2"
+      "adnova-coding-connection-v1"
     ) ||
     JSON.stringify({
-      name: "Your Profile",
-      username: "you"
+      connected: false,
+      permissions: {
+        observe: true,
+        edit: false,
+        create: false,
+        terminal: false,
+        branches: false,
+        snapshots: false
+      },
+      connectedAt: null
     })
-  )
+  ),
+
+  profile: {
+    name: "Your Profile",
+    username: "you"
+  }
 };
+
 
 const pageRoot =
   document.getElementById("page-root");
@@ -61,77 +75,231 @@ const repositoryVisibilityInput =
     "repository-visibility"
   );
 
+const pluginConsent =
+  document.getElementById(
+    "plugin-consent"
+  );
+
 const toast =
-  document.getElementById("toast");
+  document.getElementById(
+    "toast"
+  );
 
 
 function saveState() {
+
   localStorage.setItem(
-    "adnova-code-repositories-v2",
-    JSON.stringify(state.repositories)
+    "adnova-code-repositories-v3",
+    JSON.stringify(
+      state.repositories
+    )
   );
 
   localStorage.setItem(
-    "adnova-code-codespaces-v2",
-    JSON.stringify(state.codespaces)
+    "adnova-code-codespaces-v3",
+    JSON.stringify(
+      state.codespaces
+    )
   );
 
   localStorage.setItem(
-    "adnova-code-profile-v2",
-    JSON.stringify(state.profile)
+    "adnova-coding-connection-v1",
+    JSON.stringify(
+      state.pluginConnection
+    )
   );
+
 }
 
 
 function escapeHtml(value) {
+
   return String(value || "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+
 }
 
 
 function showToast(message) {
-  toast.textContent = message;
+
+  toast.textContent =
+    message;
 
   toast.classList.remove(
     "hidden"
   );
 
   clearTimeout(
-    showToast.timeout
+    showToast.timer
   );
 
-  showToast.timeout =
-    setTimeout(() => {
-      toast.classList.add(
-        "hidden"
-      );
-    }, 3000);
+  showToast.timer =
+    setTimeout(
+      () => {
+        toast.classList.add(
+          "hidden"
+        );
+      },
+      3000
+    );
+
 }
 
 
 function openRepositoryModal() {
+
   repositoryModal.classList.remove(
     "hidden"
   );
 
   repositoryNameInput.focus();
+
 }
 
 
 function closeRepositoryModal() {
+
   repositoryModal.classList.add(
     "hidden"
   );
+
+}
+
+
+function openPluginConsent() {
+
+  pluginConsent.classList.remove(
+    "hidden"
+  );
+
+
+  const permissions =
+    state.pluginConnection
+      .permissions;
+
+
+  pluginConsent
+    .querySelectorAll(
+      "[data-permission]"
+    )
+    .forEach(
+      checkbox => {
+
+        const permission =
+          checkbox.dataset.permission;
+
+        checkbox.checked =
+          Boolean(
+            permissions[permission]
+          );
+
+      }
+    );
+
+}
+
+
+function closePluginConsent() {
+
+  pluginConsent.classList.add(
+    "hidden"
+  );
+
+}
+
+
+function connectPlugin() {
+
+  const permissions = {};
+
+
+  pluginConsent
+    .querySelectorAll(
+      "[data-permission]"
+    )
+    .forEach(
+      checkbox => {
+
+        permissions[
+          checkbox.dataset.permission
+        ] =
+          checkbox.checked;
+
+      }
+    );
+
+
+  state.pluginConnection = {
+
+    connected: true,
+
+    permissions,
+
+    connectedAt:
+      new Date().toISOString()
+
+  };
+
+
+  saveState();
+
+
+  closePluginConsent();
+
+
+  showToast(
+    "Adnova Coding connected."
+  );
+
+
+  renderPage();
+
+}
+
+
+function disconnectPlugin() {
+
+  state.pluginConnection = {
+
+    connected: false,
+
+    permissions: {
+      observe: true,
+      edit: false,
+      create: false,
+      terminal: false,
+      branches: false,
+      snapshots: false
+    },
+
+    connectedAt: null
+
+  };
+
+
+  saveState();
+
+
+  showToast(
+    "Adnova Coding disconnected."
+  );
+
+
+  renderPage();
+
 }
 
 
 function renderSidebarRepositories() {
 
-  if (!state.repositories.length) {
+  if (
+    !state.repositories.length
+  ) {
+
     repositorySidebar.innerHTML = `
       <div class="empty-list">
         No repositories
@@ -139,50 +307,71 @@ function renderSidebarRepositories() {
     `;
 
     return;
+
   }
+
 
   repositorySidebar.innerHTML =
     state.repositories
       .slice(0, 12)
-      .map(repo => `
-        <button
-          class="repository-side-link"
-          data-repository="${repo.id}"
-        >
-          ${repo.visibility === "public" ? "◉" : "●"}
-          ${escapeHtml(repo.name)}
-        </button>
-      `)
+      .map(
+        repo => `
+          <button
+            class="repository-side-link"
+            data-repository="${repo.id}"
+          >
+            ${
+              repo.visibility ===
+                "public"
+                ? "◉"
+                : "●"
+            }
+
+            ${escapeHtml(
+              repo.name
+            )}
+
+          </button>
+        `
+      )
       .join("");
+
 
   repositorySidebar
     .querySelectorAll(
       "[data-repository]"
     )
-    .forEach(button => {
+    .forEach(
+      button => {
 
-      button.addEventListener(
-        "click",
-        () => {
+        button.addEventListener(
+          "click",
+          () => {
 
-          const repo =
-            state.repositories.find(
-              item =>
-                item.id ===
-                button.dataset.repository
+            const repo =
+              state.repositories.find(
+                item =>
+                  item.id ===
+                  button.dataset.repository
+              );
+
+            if (!repo) {
+              return;
+            }
+
+            state.page =
+              "repository";
+
+            renderRepository(
+              repo
             );
 
-          if (!repo) return;
+          }
+        );
 
-          state.page =
-            "repository";
+      }
+    );
 
-          renderRepository(repo);
-
-        }
-      );
-
-    });
 }
 
 
@@ -191,21 +380,27 @@ function renderHome() {
   breadcrumb.textContent =
     "Home";
 
+
   pageRoot.innerHTML = `
+
     <div class="page">
 
       <div class="page-header">
 
         <div class="page-title">
 
-          <h1>Welcome to Adnova Code</h1>
+          <h1>
+            Welcome to Adnova Code
+          </h1>
 
           <p>
-            Your development home for repositories,
-            Codespaces, branches and AI-assisted coding.
+            Your development home for
+            repositories, Codespaces,
+            branches and AI-assisted coding.
           </p>
 
         </div>
+
 
         <div class="page-actions">
 
@@ -224,6 +419,7 @@ function renderHome() {
       <div class="card-grid">
 
         <div class="card">
+
           <div class="stat-number">
             ${state.repositories.length}
           </div>
@@ -231,10 +427,12 @@ function renderHome() {
           <div class="stat-label">
             Repositories
           </div>
+
         </div>
 
 
         <div class="card">
+
           <div class="stat-number">
             ${state.codespaces.length}
           </div>
@@ -242,17 +440,24 @@ function renderHome() {
           <div class="stat-label">
             Codespaces
           </div>
+
         </div>
 
 
         <div class="card">
+
           <div class="stat-number">
-            1
+            ${
+              state.pluginConnection.connected
+                ? "On"
+                : "Off"
+            }
           </div>
 
           <div class="stat-label">
-            Installed plugin
+            Adnova Coding
           </div>
+
         </div>
 
       </div>
@@ -264,10 +469,14 @@ function renderHome() {
           Recent repositories
         </div>
 
+
         ${
           state.repositories.length
             ? `
-              <div class="repository-grid">
+
+              <div
+                class="repository-grid"
+              >
 
                 ${state.repositories
                   .slice(0, 6)
@@ -277,8 +486,10 @@ function renderHome() {
                   .join("")}
 
               </div>
+
             `
             : `
+
               <div class="empty-state">
 
                 <h2>
@@ -298,13 +509,16 @@ function renderHome() {
                 </button>
 
               </div>
+
             `
         }
 
       </div>
 
     </div>
+
   `;
+
 
   document
     .getElementById(
@@ -315,6 +529,7 @@ function renderHome() {
       openRepositoryModal
     );
 
+
   document
     .getElementById(
       "empty-create-repository"
@@ -324,7 +539,9 @@ function renderHome() {
       openRepositoryModal
     );
 
-  bindRepositoryCardButtons();
+
+  bindRepositoryButtons();
+
 }
 
 
@@ -333,6 +550,7 @@ function renderRepositoryCard(
 ) {
 
   return `
+
     <div class="repository-card">
 
       <div class="repository-card-top">
@@ -340,27 +558,36 @@ function renderRepositoryCard(
         <div>
 
           <h3>
+
             ${
-              repo.visibility === "public"
+              repo.visibility ===
+                "public"
                 ? "◉"
                 : "●"
             }
 
-            ${escapeHtml(repo.name)}
+            ${escapeHtml(
+              repo.name
+            )}
+
           </h3>
 
+
           <p>
+
             ${
               escapeHtml(
                 repo.description ||
                 "No description."
               )
             }
+
           </p>
 
         </div>
 
       </div>
+
 
       <div class="badges">
 
@@ -385,7 +612,9 @@ function renderRepositoryCard(
       </div>
 
 
-      <div class="repository-card-actions">
+      <div
+        class="repository-card-actions"
+      >
 
         <button
           class="secondary-button"
@@ -393,6 +622,7 @@ function renderRepositoryCard(
         >
           Open repository
         </button>
+
 
         <button
           class="primary-button"
@@ -404,64 +634,81 @@ function renderRepositoryCard(
       </div>
 
     </div>
+
   `;
+
 }
 
 
-function bindRepositoryCardButtons() {
+function bindRepositoryButtons() {
 
   pageRoot
     .querySelectorAll(
       "[data-open-repository]"
     )
-    .forEach(button => {
+    .forEach(
+      button => {
 
-      button.addEventListener(
-        "click",
-        () => {
+        button.addEventListener(
+          "click",
+          () => {
 
-          const repo =
-            state.repositories.find(
-              item =>
-                item.id ===
-                button.dataset.openRepository
+            const repo =
+              state.repositories.find(
+                item =>
+                  item.id ===
+                  button.dataset
+                    .openRepository
+              );
+
+            if (!repo) {
+              return;
+            }
+
+            renderRepository(
+              repo
             );
 
-          if (!repo) return;
+          }
+        );
 
-          renderRepository(repo);
-
-        }
-      );
-
-    });
+      }
+    );
 
 
   pageRoot
     .querySelectorAll(
       "[data-create-codespace]"
     )
-    .forEach(button => {
+    .forEach(
+      button => {
 
-      button.addEventListener(
-        "click",
-        () => {
+        button.addEventListener(
+          "click",
+          () => {
 
-          const repo =
-            state.repositories.find(
-              item =>
-                item.id ===
-                button.dataset.createCodespace
+            const repo =
+              state.repositories.find(
+                item =>
+                  item.id ===
+                  button.dataset
+                    .createCodespace
+              );
+
+            if (!repo) {
+              return;
+            }
+
+            createCodespace(
+              repo
             );
 
-          if (!repo) return;
+          }
+        );
 
-          createCodespace(repo);
+      }
+    );
 
-        }
-      );
-
-    });
 }
 
 
@@ -470,20 +717,25 @@ function renderRepositories() {
   breadcrumb.textContent =
     "Repositories";
 
+
   pageRoot.innerHTML = `
+
     <div class="page">
 
       <div class="page-header">
 
         <div class="page-title">
 
-          <h1>Repositories</h1>
+          <h1>
+            Repositories
+          </h1>
 
           <p>
             All of your Adnova Code projects.
           </p>
 
         </div>
+
 
         <button
           class="primary-button"
@@ -498,6 +750,7 @@ function renderRepositories() {
       ${
         state.repositories.length
           ? `
+
             <div class="repository-grid">
 
               ${state.repositories
@@ -507,8 +760,10 @@ function renderRepositories() {
                 .join("")}
 
             </div>
+
           `
           : `
+
             <div class="empty-state">
 
               <h2>
@@ -516,7 +771,7 @@ function renderRepositories() {
               </h2>
 
               <p>
-                Your first project starts here.
+                Create your first project.
               </p>
 
               <button
@@ -527,10 +782,12 @@ function renderRepositories() {
               </button>
 
             </div>
+
           `
       }
 
     </div>
+
   `;
 
 
@@ -554,7 +811,8 @@ function renderRepositories() {
     );
 
 
-  bindRepositoryCardButtons();
+  bindRepositoryButtons();
+
 }
 
 
@@ -567,6 +825,7 @@ function renderRepository(
 
 
   pageRoot.innerHTML = `
+
     <div class="page">
 
       <div class="page-header">
@@ -574,7 +833,9 @@ function renderRepository(
         <div class="page-title">
 
           <h1>
-            ${escapeHtml(repo.name)}
+            ${escapeHtml(
+              repo.name
+            )}
           </h1>
 
           <p>
@@ -585,6 +846,7 @@ function renderRepository(
               )
             }
           </p>
+
 
           <div
             class="badges"
@@ -599,16 +861,6 @@ function renderRepository(
               ${repo.defaultBranch}
             </span>
 
-            ${
-              repo.readme
-                ? `
-                  <span class="badge">
-                    README
-                  </span>
-                `
-                : ""
-            }
-
           </div>
 
         </div>
@@ -622,6 +874,7 @@ function renderRepository(
           >
             Back
           </button>
+
 
           <button
             class="primary-button"
@@ -641,6 +894,7 @@ function renderRepository(
           Repository
         </div>
 
+
         <div class="setting-row">
 
           <span>
@@ -652,6 +906,7 @@ function renderRepository(
           </strong>
 
         </div>
+
 
         <div class="setting-row">
 
@@ -665,6 +920,7 @@ function renderRepository(
 
         </div>
 
+
         <div class="setting-row">
 
           <span>
@@ -672,7 +928,11 @@ function renderRepository(
           </span>
 
           <strong>
-            ${repo.readme ? "Enabled" : "Not added"}
+            ${
+              repo.readme
+                ? "Enabled"
+                : "Not added"
+            }
           </strong>
 
         </div>
@@ -686,6 +946,7 @@ function renderRepository(
           Codespaces
         </div>
 
+
         ${
           state.codespaces.filter(
             space =>
@@ -693,6 +954,7 @@ function renderRepository(
               repo.id
           ).length
             ? `
+
               <div class="codespace-list">
 
                 ${state.codespaces
@@ -707,8 +969,10 @@ function renderRepository(
                   .join("")}
 
               </div>
+
             `
             : `
+
               <div class="empty-state">
 
                 <h2>
@@ -716,8 +980,8 @@ function renderRepository(
                 </h2>
 
                 <p>
-                  Create a Codespace to open
-                  this project in the coding workspace.
+                  Create a Codespace to
+                  enter the development workspace.
                 </p>
 
                 <button
@@ -728,12 +992,14 @@ function renderRepository(
                 </button>
 
               </div>
+
             `
         }
 
       </div>
 
     </div>
+
   `;
 
 
@@ -773,29 +1039,35 @@ function renderRepository(
     .querySelectorAll(
       "[data-open-codespace]"
     )
-    .forEach(button => {
+    .forEach(
+      button => {
 
-      button.addEventListener(
-        "click",
-        () => {
+        button.addEventListener(
+          "click",
+          () => {
 
-          const space =
-            state.codespaces.find(
-              item =>
-                item.id ===
-                button.dataset.openCodespace
+            const space =
+              state.codespaces.find(
+                item =>
+                  item.id ===
+                  button.dataset
+                    .openCodespace
+              );
+
+            if (!space) {
+              return;
+            }
+
+            openCodespace(
+              space
             );
 
-          if (!space) return;
+          }
+        );
 
-          openCodespace(
-            space
-          );
+      }
+    );
 
-        }
-      );
-
-    });
 }
 
 
@@ -804,20 +1076,29 @@ function renderCodespaceCard(
 ) {
 
   return `
+
     <div class="codespace-card">
 
       <div class="codespace-info">
 
         <h3>
-          ${escapeHtml(space.name)}
+          ${escapeHtml(
+            space.name
+          )}
         </h3>
 
         <p>
-          ${escapeHtml(space.branch)}
-          · ${escapeHtml(space.status)}
+          ${escapeHtml(
+            space.branch
+          )}
+          ·
+          ${escapeHtml(
+            space.status
+          )}
         </p>
 
       </div>
+
 
       <button
         class="primary-button"
@@ -827,7 +1108,9 @@ function renderCodespaceCard(
       </button>
 
     </div>
+
   `;
+
 }
 
 
@@ -844,34 +1127,51 @@ function createCodespace(
           repo.defaultBranch
     );
 
+
   if (existing) {
 
     showToast(
       "Codespace already exists."
     );
 
-    setTimeout(() => {
-      openCodespace(existing);
-    }, 250);
+
+    setTimeout(
+      () =>
+        openCodespace(
+          existing
+        ),
+      250
+    );
+
 
     return;
+
   }
 
 
   const space = {
-    id: crypto.randomUUID(),
+
+    id:
+      crypto.randomUUID(),
+
     name:
       `${repo.name} Codespace`,
+
     repositoryId:
       repo.id,
+
     repository:
       repo.name,
+
     branch:
       repo.defaultBranch,
+
     status:
       "Ready",
+
     createdAt:
       Date.now()
+
   };
 
 
@@ -879,16 +1179,149 @@ function createCodespace(
     space
   );
 
+
   saveState();
+
 
   showToast(
     "Codespace created."
   );
 
 
-  setTimeout(() => {
-    openCodespace(space);
-  }, 350);
+  setTimeout(
+    () =>
+      openCodespace(
+        space
+      ),
+    350
+  );
+
+}
+
+
+function renderCodespaces() {
+
+  breadcrumb.textContent =
+    "Codespaces";
+
+
+  pageRoot.innerHTML = `
+
+    <div class="page">
+
+      <div class="page-header">
+
+        <div class="page-title">
+
+          <h1>
+            Codespaces
+          </h1>
+
+          <p>
+            Saved development environments.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      ${
+        state.codespaces.length
+          ? `
+
+            <div
+              class="codespace-list"
+            >
+
+              ${state.codespaces
+                .map(
+                  renderCodespaceCard
+                )
+                .join("")}
+
+            </div>
+
+          `
+          : `
+
+            <div class="empty-state">
+
+              <h2>
+                No Codespaces yet
+              </h2>
+
+              <p>
+                Create one from a repository.
+              </p>
+
+              <button
+                class="primary-button"
+                id="codespaces-go-repositories"
+              >
+                View repositories
+              </button>
+
+            </div>
+
+          `
+      }
+
+    </div>
+
+  `;
+
+
+  document
+    .getElementById(
+      "codespaces-go-repositories"
+    )
+    ?.addEventListener(
+      "click",
+      () => {
+
+        state.page =
+          "repositories";
+
+        renderPage();
+
+      }
+    );
+
+
+  pageRoot
+    .querySelectorAll(
+      "[data-open-codespace]"
+    )
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            const space =
+              state.codespaces.find(
+                item =>
+                  item.id ===
+                  button.dataset
+                    .openCodespace
+              );
+
+            if (!space) {
+              return;
+            }
+
+            openCodespace(
+              space
+            );
+
+          }
+        );
+
+      }
+    );
+
 }
 
 
@@ -899,10 +1332,13 @@ function openCodespace(
   state.page =
     "codespace";
 
+
   breadcrumb.textContent =
     `${space.repository} / Codespace`;
 
+
   pageRoot.innerHTML = `
+
     <div class="code-workspace">
 
       <div class="code-workspace-topbar">
@@ -916,14 +1352,19 @@ function openCodespace(
             ‹
           </button>
 
+
           <div>
 
             <strong>
-              ${escapeHtml(space.repository)}
+              ${escapeHtml(
+                space.repository
+              )}
             </strong>
 
             <span>
-              ${escapeHtml(space.branch)}
+              ${escapeHtml(
+                space.branch
+              )}
             </span>
 
           </div>
@@ -931,7 +1372,9 @@ function openCodespace(
         </div>
 
 
-        <div class="workspace-actions">
+        <div
+          class="workspace-actions"
+        >
 
           <button
             class="secondary-button"
@@ -940,12 +1383,14 @@ function openCodespace(
             Preview
           </button>
 
+
           <button
             class="secondary-button"
             id="workspace-snapshot"
           >
             Snapshot
           </button>
+
 
           <button
             class="primary-button"
@@ -968,10 +1413,15 @@ function openCodespace(
           </div>
 
           <div class="workspace-panel-subheader">
-            ${escapeHtml(space.repository)}
+            ${escapeHtml(
+              space.repository
+            )}
           </div>
 
-          <div class="workspace-file-tree">
+
+          <div
+            class="workspace-file-tree"
+          >
 
             <button
               class="file-item active"
@@ -981,6 +1431,7 @@ function openCodespace(
               README.md
             </button>
 
+
             <button
               class="file-item"
               data-file="package.json"
@@ -988,6 +1439,7 @@ function openCodespace(
               <span>📄</span>
               package.json
             </button>
+
 
             <button
               class="file-item"
@@ -998,6 +1450,7 @@ function openCodespace(
             </button>
 
           </div>
+
 
           <button
             class="explorer-add"
@@ -1013,24 +1466,38 @@ function openCodespace(
 
           <div class="editor-tab">
 
-            <span id="editor-file-name">
+            <span
+              id="editor-file-name"
+            >
               README.md
             </span>
 
-            <span class="editor-unsaved">
+            <span
+              class="editor-unsaved"
+            >
               Saved
             </span>
 
           </div>
 
+
           <textarea
             id="code-editor-textarea"
             spellcheck="false"
-          ># ${escapeHtml(space.repository)}
+          ># ${escapeHtml(
+            space.repository
+          )}
 
 Welcome to your Adnova Code workspace.
 
-Branch: ${escapeHtml(space.branch)}
+Branch:
+${escapeHtml(
+  space.branch
+)}
+
+Plugin:
+Adnova Coding
+
           </textarea>
 
         </section>
@@ -1041,13 +1508,19 @@ Branch: ${escapeHtml(space.branch)}
           <div class="coding-header">
 
             <div>
+
               <strong>
                 Adnova Coding
               </strong>
 
               <span>
-                Installed plugin
+                ${
+                  state.pluginConnection.connected
+                    ? "Connected"
+                    : "Not connected"
+                }
               </span>
+
             </div>
 
           </div>
@@ -1058,9 +1531,16 @@ Branch: ${escapeHtml(space.branch)}
             class="coding-messages"
           >
 
-            <div class="coding-message">
-              Tell Adnova Coding what you want
-              to build, change or debug.
+            <div
+              class="coding-message"
+            >
+
+              ${
+                state.pluginConnection.connected
+                  ? "Adnova Coding is ready."
+                  : "Connect Adnova Coding from Plugins to give Adnova AI access to this workspace."
+              }
+
             </div>
 
           </div>
@@ -1071,12 +1551,27 @@ Branch: ${escapeHtml(space.branch)}
             <textarea
               id="coding-input"
               rows="3"
-              placeholder="Ask Adnova Coding..."
+              placeholder="${
+                state.pluginConnection.connected
+                  ? "Ask Adnova Coding..."
+                  : "Plugin disconnected"
+              }"
+              ${
+                state.pluginConnection.connected
+                  ? ""
+                  : "disabled"
+              }
             ></textarea>
+
 
             <button
               id="coding-send"
               class="coding-send"
+              ${
+                state.pluginConnection.connected
+                  ? ""
+                  : "disabled"
+              }
             >
               ↑
             </button>
@@ -1093,8 +1588,17 @@ Branch: ${escapeHtml(space.branch)}
         <div class="terminal-header">
 
           <div>
-            <strong>Terminal</strong>
-            <span>/projects/${escapeHtml(space.repository)}</span>
+
+            <strong>
+              Terminal
+            </strong>
+
+            <span>
+              /projects/${escapeHtml(
+                space.repository
+              )}
+            </span>
+
           </div>
 
           <span class="terminal-status">
@@ -1108,27 +1612,35 @@ Branch: ${escapeHtml(space.branch)}
           id="workspace-terminal-output"
           class="terminal-output"
         >
+
           <div>
             Adnova Code terminal
           </div>
 
           <div>
             Workspace:
-            /projects/${escapeHtml(space.repository)}
+            /projects/${escapeHtml(
+              space.repository
+            )}
           </div>
 
           <div>
             Branch:
-            ${escapeHtml(space.branch)}
+            ${escapeHtml(
+              space.branch
+            )}
           </div>
 
           <br>
+
         </div>
 
 
         <div class="terminal-input">
 
-          <span>›</span>
+          <span>
+            ›
+          </span>
 
           <input
             id="workspace-terminal-input"
@@ -1142,6 +1654,7 @@ Branch: ${escapeHtml(space.branch)}
       </div>
 
     </div>
+
   `;
 
 
@@ -1161,16 +1674,22 @@ Branch: ${escapeHtml(space.branch)}
           );
 
         if (repo) {
-          renderRepository(repo);
+
+          renderRepository(
+            repo
+          );
+
         } else {
+
           renderRepositories();
+
         }
 
       }
     );
 
 
-  setupWorkspaceFileEditing(
+  setupWorkspaceFiles(
     space
   );
 
@@ -1192,7 +1711,7 @@ Branch: ${escapeHtml(space.branch)}
       () => {
 
         showToast(
-          "Preview will open when the project has a running server."
+          "Preview will open when a project server is running."
         );
 
       }
@@ -1208,7 +1727,7 @@ Branch: ${escapeHtml(space.branch)}
       () => {
 
         showToast(
-          "Snapshot saved."
+          "Snapshot created."
         );
 
       }
@@ -1229,30 +1748,27 @@ Branch: ${escapeHtml(space.branch)}
 
       }
     );
+
 }
 
 
-function setupWorkspaceFileEditing(
+function setupWorkspaceFiles(
   space
 ) {
-
-  const fileButtons =
-    document.querySelectorAll(
-      ".file-item"
-    );
 
   const editor =
     document.getElementById(
       "code-editor-textarea"
     );
 
-  const fileName =
+  const currentFile =
     document.getElementById(
       "editor-file-name"
     );
 
 
   const files = {
+
     "README.md":
       `# ${space.repository}\n\nWelcome to Adnova Code.\n\nBranch: ${space.branch}\n`,
 
@@ -1261,56 +1777,81 @@ function setupWorkspaceFileEditing(
 
     src:
       "// src directory\n"
+
   };
 
 
-  fileButtons.forEach(
-    button => {
+  function selectFile(
+    button
+  ) {
 
-      button.addEventListener(
-        "click",
-        () => {
-
-          const file =
-            button.dataset.file;
-
-          fileButtons.forEach(
-            item =>
-              item.classList.remove(
-                "active"
-              )
-          );
-
-          button.classList.add(
+    document
+      .querySelectorAll(
+        ".file-item"
+      )
+      .forEach(
+        item =>
+          item.classList.remove(
             "active"
-          );
-
-          fileName.textContent =
-            file;
-
-          editor.value =
-            files[file] ||
-            "";
-
-        }
+          )
       );
 
-    }
-  );
+
+    button.classList.add(
+      "active"
+    );
+
+
+    const file =
+      button.dataset.file;
+
+
+    currentFile.textContent =
+      file;
+
+
+    editor.value =
+      files[file] ||
+      "";
+
+  }
+
+
+  document
+    .querySelectorAll(
+      ".file-item"
+    )
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          "click",
+          () =>
+            selectFile(
+              button
+            )
+        );
+
+      }
+    );
 
 
   editor.addEventListener(
     "input",
     () => {
 
-      const status =
+      const indicator =
         document.querySelector(
           ".editor-unsaved"
         );
 
-      if (status) {
-        status.textContent =
+      if (
+        indicator
+      ) {
+
+        indicator.textContent =
           "Unsaved";
+
       }
 
     }
@@ -1330,47 +1871,42 @@ function setupWorkspaceFileEditing(
             "New file name"
           );
 
-        if (!name) return;
+
+        if (!name) {
+          return;
+        }
+
 
         const button =
           document.createElement(
             "button"
           );
 
+
         button.className =
           "file-item";
+
 
         button.dataset.file =
           name;
 
+
         button.innerHTML = `
           <span>📄</span>
-          ${escapeHtml(name)}
+          ${escapeHtml(
+            name
+          )}
         `;
+
 
         button.addEventListener(
           "click",
-          () => {
-
-            fileButtons.forEach(
-              item =>
-                item.classList.remove(
-                  "active"
-                )
-            );
-
-            button.classList.add(
-              "active"
-            );
-
-            fileName.textContent =
-              name;
-
-            editor.value =
-              "";
-
-          }
+          () =>
+            selectFile(
+              button
+            )
         );
+
 
         document
           .querySelector(
@@ -1380,12 +1916,14 @@ function setupWorkspaceFileEditing(
             button
           );
 
+
         showToast(
           `${name} created.`
         );
 
       }
     );
+
 }
 
 
@@ -1404,7 +1942,9 @@ function setupWorkspaceTerminal(
     );
 
 
-  function print(text) {
+  function print(
+    text
+  ) {
 
     const line =
       document.createElement(
@@ -1420,6 +1960,7 @@ function setupWorkspaceTerminal(
 
     output.scrollTop =
       output.scrollHeight;
+
   }
 
 
@@ -1431,20 +1972,28 @@ function setupWorkspaceTerminal(
         event.key !==
         "Enter"
       ) {
+
         return;
+
       }
+
 
       const command =
         input.value.trim();
 
+
       input.value =
         "";
+
 
       if (!command) {
         return;
       }
 
-      print(`› ${command}`);
+
+      print(
+        `› ${command}`
+      );
 
 
       if (
@@ -1498,39 +2047,13 @@ function setupWorkspaceTerminal(
       }
 
 
-      if (
-        command ===
-        "code ."
-      ) {
-
-        print(
-          "Workspace already open."
-        );
-
-        return;
-      }
-
-
-      if (
-        command.startsWith(
-          "npm "
-        )
-      ) {
-
-        print(
-          `npm command queued: ${command}`
-        );
-
-        return;
-      }
-
-
       print(
         `Command received: ${command}`
       );
 
     }
   );
+
 }
 
 
@@ -1554,30 +2077,56 @@ function setupCodingAI(
     );
 
 
+  if (
+    !input ||
+    !send ||
+    !messages
+  ) {
+
+    return;
+
+  }
+
+
   async function submit() {
+
+    if (
+      !state.pluginConnection.connected
+    ) {
+
+      showToast(
+        "Connect Adnova Coding first."
+      );
+
+      return;
+
+    }
+
 
     const promptText =
       input.value.trim();
+
 
     if (!promptText) {
       return;
     }
 
 
-    const userMessage =
+    const user =
       document.createElement(
         "div"
       );
 
-    userMessage.className =
+    user.className =
       "coding-message user";
 
-    userMessage.textContent =
+    user.textContent =
       promptText;
 
     messages.appendChild(
-      userMessage
+      user
     );
+
 
     input.value =
       "";
@@ -1589,7 +2138,8 @@ function setupCodingAI(
         await fetch(
           "/api/plugin/prompt",
           {
-            method: "POST",
+            method:
+              "POST",
 
             headers: {
               "Content-Type":
@@ -1611,6 +2161,11 @@ function setupCodingAI(
                   branch:
                     space.branch
                 },
+
+                permissions:
+                  state
+                    .pluginConnection
+                    .permissions,
 
                 attachments:
                   []
@@ -1634,7 +2189,7 @@ function setupCodingAI(
 
       assistant.textContent =
         data.ok
-          ? "Adnova Coding received the request. The real coding agent will use this workspace context."
+          ? "Adnova Coding received the request and workspace permissions."
           : (
               data.error ||
               "Request failed."
@@ -1661,7 +2216,7 @@ function setupCodingAI(
         "coding-message";
 
       assistant.textContent =
-        "Adnova Coding could not reach the plugin service.";
+        "The Adnova Coding service could not be reached.";
 
       messages.appendChild(
         assistant
@@ -1696,201 +2251,40 @@ function setupCodingAI(
 
     }
   );
+
 }
 
 
-function renderCodespaces() {
+function renderPluginStatus() {
 
-  breadcrumb.textContent =
-    "Codespaces";
-
-
-  pageRoot.innerHTML = `
-    <div class="page">
-
-      <div class="page-header">
-
-        <div class="page-title">
-
-          <h1>Codespaces</h1>
-
-          <p>
-            Your saved Adnova Code development environments.
-          </p>
-
-        </div>
-
-      </div>
+  const connected =
+    state
+      .pluginConnection
+      .connected;
 
 
-      ${
-        state.codespaces.length
-          ? `
-            <div class="codespace-list">
+  return connected
+    ? `
+      <span
+        class="
+          plugin-status
+          plugin-status-connected
+        "
+      >
+        Connected
+      </span>
+    `
+    : `
+      <span
+        class="
+          plugin-status
+          plugin-status-disconnected
+        "
+      >
+        Not connected
+      </span>
+    `;
 
-              ${state.codespaces
-                .map(
-                  renderCodespaceCard
-                )
-                .join("")}
-
-            </div>
-          `
-          : `
-            <div class="empty-state">
-
-              <h2>
-                No Codespaces yet
-              </h2>
-
-              <p>
-                Create one from a repository.
-              </p>
-
-              <button
-                class="primary-button"
-                id="codespaces-go-repositories"
-              >
-                View repositories
-              </button>
-
-            </div>
-          `
-      }
-
-    </div>
-  `;
-
-
-  document
-    .getElementById(
-      "codespaces-go-repositories"
-    )
-    ?.addEventListener(
-      "click",
-      () => {
-
-        state.page =
-          "repositories";
-
-        renderPage();
-
-      }
-    );
-
-
-  pageRoot
-    .querySelectorAll(
-      "[data-open-codespace]"
-    )
-    .forEach(button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          const space =
-            state.codespaces.find(
-              item =>
-                item.id ===
-                button.dataset.openCodespace
-            );
-
-          if (!space) {
-            return;
-          }
-
-          openCodespace(
-            space
-          );
-
-        }
-      );
-
-    });
-}
-
-
-function renderBranches() {
-
-  breadcrumb.textContent =
-    "Branches";
-
-
-  pageRoot.innerHTML = `
-    <div class="page">
-
-      <div class="page-header">
-
-        <div class="page-title">
-
-          <h1>Branches</h1>
-
-          <p>
-            Keep development work separated and organized.
-          </p>
-
-        </div>
-
-      </div>
-
-
-      ${
-        state.repositories.length
-          ? `
-            <div class="codespace-list">
-
-              ${state.repositories
-                .map(
-                  repo => `
-                    <div
-                      class="codespace-card"
-                    >
-
-                      <div
-                        class="codespace-info"
-                      >
-
-                        <h3>
-                          main
-                        </h3>
-
-                        <p>
-                          ${escapeHtml(
-                            repo.name
-                          )}
-                        </p>
-
-                      </div>
-
-                      <span class="badge">
-                        Default
-                      </span>
-
-                    </div>
-                  `
-                )
-                .join("")}
-
-            </div>
-          `
-          : `
-            <div class="empty-state">
-
-              <h2>
-                No branches
-              </h2>
-
-              <p>
-                Create a repository first.
-              </p>
-
-            </div>
-          `
-      }
-
-    </div>
-  `;
 }
 
 
@@ -1901,16 +2295,20 @@ function renderPlugins() {
 
 
   pageRoot.innerHTML = `
+
     <div class="page">
 
       <div class="page-header">
 
         <div class="page-title">
 
-          <h1>Plugins</h1>
+          <h1>
+            Plugins
+          </h1>
 
           <p>
-            Installed integrations available to Adnova Code.
+            Connect external Adnova services
+            to this workspace.
           </p>
 
         </div>
@@ -1924,6 +2322,7 @@ function renderPlugins() {
           A
         </div>
 
+
         <div class="plugin-copy">
 
           <strong>
@@ -1931,20 +2330,127 @@ function renderPlugins() {
           </strong>
 
           <span>
-            The bridge between Adnova AI
-            and Adnova Code.
+            Connects Adnova AI with
+            Adnova Code.
           </span>
 
         </div>
 
-        <span class="plugin-status">
-          Installed
-        </span>
+
+        ${renderPluginStatus()}
+
+
+        ${
+          state.pluginConnection.connected
+            ? `
+              <button
+                class="secondary-button"
+                id="disconnect-plugin"
+              >
+                Disconnect
+              </button>
+            `
+            : `
+              <button
+                class="primary-button"
+                id="connect-plugin"
+              >
+                Connect
+              </button>
+            `
+        }
 
       </div>
 
+
+      ${
+        state.pluginConnection.connected
+          ? `
+
+            <div class="section">
+
+              <div class="section-title">
+                Granted permissions
+              </div>
+
+              <div class="card">
+
+                ${Object
+                  .entries(
+                    state.pluginConnection
+                      .permissions
+                  )
+                  .map(
+                    ([key, enabled]) => `
+                      <div
+                        class="setting-row"
+                      >
+
+                        <span>
+                          ${
+                            {
+                              observe:
+                                "Observe code",
+                              edit:
+                                "Change code",
+                              create:
+                                "Create files",
+                              terminal:
+                                "Use terminal",
+                              branches:
+                                "Manage branches",
+                              snapshots:
+                                "Manage snapshots"
+                            }[key] ||
+                            key
+                          }
+                        </span>
+
+                        <strong>
+                          ${
+                            enabled
+                              ? "Allowed"
+                              : "Not allowed"
+                          }
+                        </strong>
+
+                      </div>
+                    `
+                  )
+                  .join("")}
+
+              </div>
+
+            </div>
+
+          `
+          : ""
+      }
+
     </div>
+
   `;
+
+
+  document
+    .getElementById(
+      "connect-plugin"
+    )
+    ?.addEventListener(
+      "click",
+      openPluginConsent
+    );
+
+
+  document
+    .getElementById(
+      "disconnect-plugin"
+    )
+    ?.addEventListener(
+      "click",
+      disconnectPlugin
+    );
+
 }
 
 
@@ -1955,16 +2461,20 @@ function renderSettings() {
 
 
   pageRoot.innerHTML = `
+
     <div class="page">
 
       <div class="page-header">
 
         <div class="page-title">
 
-          <h1>Settings</h1>
+          <h1>
+            Settings
+          </h1>
 
           <p>
-            Manage your Adnova Code workspace.
+            Account, repositories,
+            Codespaces and plugins.
           </p>
 
         </div>
@@ -1977,55 +2487,79 @@ function renderSettings() {
         <div class="settings-navigation">
 
           <button
-            class="settings-tab ${
-              state.settingsTab === "account"
-                ? "active"
-                : ""
-            }"
+            class="
+              settings-tab
+              ${
+                state.settingsTab ===
+                "account"
+                  ? "active"
+                  : ""
+              }
+            "
             data-settings-tab="account"
           >
             Account
           </button>
 
+
           <button
-            class="settings-tab ${
-              state.settingsTab === "repositories"
-                ? "active"
-                : ""
-            }"
+            class="
+              settings-tab
+              ${
+                state.settingsTab ===
+                "repositories"
+                  ? "active"
+                  : ""
+              }
+            "
             data-settings-tab="repositories"
           >
             Repositories
           </button>
 
+
           <button
-            class="settings-tab ${
-              state.settingsTab === "codespaces"
-                ? "active"
-                : ""
-            }"
+            class="
+              settings-tab
+              ${
+                state.settingsTab ===
+                "codespaces"
+                  ? "active"
+                  : ""
+              }
+            "
             data-settings-tab="codespaces"
           >
             Codespaces
           </button>
 
+
           <button
-            class="settings-tab ${
-              state.settingsTab === "plugins"
-                ? "active"
-                : ""
-            }"
+            class="
+              settings-tab
+              ${
+                state.settingsTab ===
+                "plugins"
+                  ? "active"
+                  : ""
+              }
+            "
             data-settings-tab="plugins"
           >
             Plugin management
           </button>
 
+
           <button
-            class="settings-tab ${
-              state.settingsTab === "workspace"
-                ? "active"
-                : ""
-            }"
+            class="
+              settings-tab
+              ${
+                state.settingsTab ===
+                "workspace"
+                  ? "active"
+                  : ""
+              }
+            "
             data-settings-tab="workspace"
           >
             Workspace
@@ -2043,6 +2577,7 @@ function renderSettings() {
       </div>
 
     </div>
+
   `;
 
 
@@ -2050,21 +2585,25 @@ function renderSettings() {
     .querySelectorAll(
       "[data-settings-tab]"
     )
-    .forEach(button => {
+    .forEach(
+      button => {
 
-      button.addEventListener(
-        "click",
-        () => {
+        button.addEventListener(
+          "click",
+          () => {
 
-          state.settingsTab =
-            button.dataset.settingsTab;
+            state.settingsTab =
+              button.dataset
+                .settingsTab;
 
-          renderSettings();
+            renderSettings();
 
-        }
-      );
+          }
+        );
 
-    });
+      }
+    );
+
 }
 
 
@@ -2076,7 +2615,10 @@ function renderSettingsContent() {
   ) {
 
     return `
-      <div class="settings-card">
+
+      <div
+        class="settings-card"
+      >
 
         <h2>
           Repositories
@@ -2086,17 +2628,38 @@ function renderSettingsContent() {
           Repository defaults.
         </p>
 
-        <div class="setting-row">
-          <span>Repositories</span>
-          <strong>${state.repositories.length}</strong>
+
+        <div
+          class="setting-row"
+        >
+
+          <span>
+            Repository count
+          </span>
+
+          <strong>
+            ${state.repositories.length}
+          </strong>
+
         </div>
 
-        <div class="setting-row">
-          <span>Default branch</span>
-          <strong>main</strong>
+
+        <div
+          class="setting-row"
+        >
+
+          <span>
+            Default branch
+          </span>
+
+          <strong>
+            main
+          </strong>
+
         </div>
 
       </div>
+
     `;
 
   }
@@ -2108,27 +2671,51 @@ function renderSettingsContent() {
   ) {
 
     return `
-      <div class="settings-card">
+
+      <div
+        class="settings-card"
+      >
 
         <h2>
           Codespaces
         </h2>
 
         <p>
-          Workspace environment defaults.
+          Development workspace settings.
         </p>
 
-        <div class="setting-row">
-          <span>Saved Codespaces</span>
-          <strong>${state.codespaces.length}</strong>
+
+        <div
+          class="setting-row"
+        >
+
+          <span>
+            Saved Codespaces
+          </span>
+
+          <strong>
+            ${state.codespaces.length}
+          </strong>
+
         </div>
 
-        <div class="setting-row">
-          <span>Terminal</span>
-          <strong>Integrated</strong>
+
+        <div
+          class="setting-row"
+        >
+
+          <span>
+            Terminal
+          </span>
+
+          <strong>
+            Integrated
+          </strong>
+
         </div>
 
       </div>
+
     `;
 
   }
@@ -2140,41 +2727,52 @@ function renderSettingsContent() {
   ) {
 
     return `
-      <div class="settings-card">
+
+      <div
+        class="settings-card"
+      >
 
         <h2>
           Plugin management
         </h2>
 
         <p>
-          Manage integrations available to this workspace.
+          Control Adnova integrations.
         </p>
 
-        <div class="plugin-card">
 
-          <div class="plugin-icon">
+        <div
+          class="plugin-card"
+        >
+
+          <div
+            class="plugin-icon"
+          >
             A
           </div>
 
-          <div class="plugin-copy">
+
+          <div
+            class="plugin-copy"
+          >
 
             <strong>
               Adnova Coding
             </strong>
 
             <span>
-              Installed.
+              Adnova AI ↔ Adnova Code
             </span>
 
           </div>
 
-          <span class="plugin-status">
-            Active
-          </span>
+
+          ${renderPluginStatus()}
 
         </div>
 
       </div>
+
     `;
 
   }
@@ -2186,82 +2784,141 @@ function renderSettingsContent() {
   ) {
 
     return `
-      <div class="settings-card">
+
+      <div
+        class="settings-card"
+      >
 
         <h2>
           Workspace
         </h2>
 
         <p>
-          Development workspace defaults.
+          Development environment defaults.
         </p>
 
-        <div class="setting-row">
-          <span>Editor</span>
-          <strong>Enabled</strong>
+
+        <div
+          class="setting-row"
+        >
+
+          <span>
+            Editor
+          </span>
+
+          <strong>
+            Enabled
+          </strong>
+
         </div>
 
-        <div class="setting-row">
-          <span>Terminal</span>
-          <strong>Integrated</strong>
+
+        <div
+          class="setting-row"
+        >
+
+          <span>
+            Terminal
+          </span>
+
+          <strong>
+            Integrated
+          </strong>
+
         </div>
 
-        <div class="setting-row">
-          <span>Preview</span>
-          <strong>Enabled</strong>
-        </div>
 
-        <div class="setting-row">
-          <span>Coding AI</span>
-          <strong>Adnova Coding</strong>
+        <div
+          class="setting-row"
+        >
+
+          <span>
+            Preview
+          </span>
+
+          <strong>
+            Enabled
+          </strong>
+
         </div>
 
       </div>
+
     `;
 
   }
 
 
   return `
-    <div class="settings-card">
+
+    <div
+      class="settings-card"
+    >
 
       <h2>
         Account
       </h2>
 
       <p>
-        Your Adnova Code profile.
+        Accounts will be added later.
+        The current workspace is local-only.
       </p>
 
-      <div class="setting-row">
-        <span>Name</span>
+
+      <div
+        class="setting-row"
+      >
+
+        <span>
+          Profile
+        </span>
+
         <strong>
-          ${escapeHtml(state.profile.name)}
+          ${escapeHtml(
+            state.profile.name
+          )}
         </strong>
+
       </div>
 
-      <div class="setting-row">
-        <span>Username</span>
+
+      <div
+        class="setting-row"
+      >
+
+        <span>
+          Username
+        </span>
+
         <strong>
-          @${escapeHtml(state.profile.username)}
+          @${escapeHtml(
+            state.profile.username
+          )}
         </strong>
+
       </div>
 
     </div>
+
   `;
+
 }
 
 
 function createRepository() {
 
   const name =
-    repositoryNameInput.value.trim();
+    repositoryNameInput
+      .value
+      .trim();
+
 
   if (!name) {
 
     repositoryNameInput.focus();
 
     return;
+
   }
 
 
@@ -2298,9 +2955,12 @@ function createRepository() {
     repository
   );
 
+
   saveState();
 
+
   renderSidebarRepositories();
+
 
   closeRepositoryModal();
 
@@ -2326,34 +2986,32 @@ function createRepository() {
   state.page =
     "repository";
 
+
   renderRepository(
     repository
   );
-}
-
-
-function updateNavigation() {
-
-  document
-    .querySelectorAll(
-      ".nav-link[data-page]"
-    )
-    .forEach(button => {
-
-      button.classList.toggle(
-        "active",
-        button.dataset.page ===
-          state.page
-      );
-
-    });
 
 }
 
 
 function renderPage() {
 
-  updateNavigation();
+  document
+    .querySelectorAll(
+      ".nav-link[data-page]"
+    )
+    .forEach(
+      button => {
+
+        button.classList.toggle(
+          "active",
+          button.dataset.page ===
+            state.page
+        );
+
+      }
+    );
+
 
   if (
     state.page ===
@@ -2363,6 +3021,7 @@ function renderPage() {
     renderHome();
 
     return;
+
   }
 
 
@@ -2374,6 +3033,7 @@ function renderPage() {
     renderRepositories();
 
     return;
+
   }
 
 
@@ -2385,6 +3045,7 @@ function renderPage() {
     renderCodespaces();
 
     return;
+
   }
 
 
@@ -2396,6 +3057,7 @@ function renderPage() {
     renderBranches();
 
     return;
+
   }
 
 
@@ -2407,6 +3069,7 @@ function renderPage() {
     renderPlugins();
 
     return;
+
   }
 
 
@@ -2418,10 +3081,113 @@ function renderPage() {
     renderSettings();
 
     return;
+
   }
 
 
   renderHome();
+
+}
+
+
+function renderBranches() {
+
+  breadcrumb.textContent =
+    "Branches";
+
+
+  pageRoot.innerHTML = `
+
+    <div class="page">
+
+      <div class="page-header">
+
+        <div class="page-title">
+
+          <h1>
+            Branches
+          </h1>
+
+          <p>
+            Project branches will live here.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      ${
+        state.repositories.length
+          ? `
+
+            <div
+              class="codespace-list"
+            >
+
+              ${state.repositories
+                .map(
+                  repo => `
+
+                    <div
+                      class="codespace-card"
+                    >
+
+                      <div
+                        class="codespace-info"
+                      >
+
+                        <h3>
+                          main
+                        </h3>
+
+                        <p>
+                          ${
+                            escapeHtml(
+                              repo.name
+                            )
+                          }
+                        </p>
+
+                      </div>
+
+
+                      <span class="badge">
+                        Default
+                      </span>
+
+                    </div>
+
+                  `
+                )
+                .join("")}
+
+            </div>
+
+          `
+          : `
+
+            <div
+              class="empty-state"
+            >
+
+              <h2>
+                No branches yet
+              </h2>
+
+              <p>
+                Create a repository first.
+              </p>
+
+            </div>
+
+          `
+      }
+
+    </div>
+
+  `;
+
 }
 
 
@@ -2429,21 +3195,23 @@ document
   .querySelectorAll(
     ".nav-link[data-page]"
   )
-  .forEach(button => {
+  .forEach(
+    button => {
 
-    button.addEventListener(
-      "click",
-      () => {
+      button.addEventListener(
+        "click",
+        () => {
 
-        state.page =
-          button.dataset.page;
+          state.page =
+            button.dataset.page;
 
-        renderPage();
+          renderPage();
 
-      }
-    );
+        }
+      );
 
-  });
+    }
+  );
 
 
 document
@@ -2577,18 +3345,50 @@ document
 
 document
   .getElementById(
-    "profile-name"
+    "close-plugin-consent"
   )
-  .textContent =
-    state.profile.name;
+  .addEventListener(
+    "click",
+    closePluginConsent
+  );
 
 
 document
   .getElementById(
-    "profile-handle"
+    "cancel-plugin-consent"
   )
-  .textContent =
-    `@${state.profile.username}`;
+  .addEventListener(
+    "click",
+    closePluginConsent
+  );
+
+
+document
+  .getElementById(
+    "allow-plugin"
+  )
+  .addEventListener(
+    "click",
+    connectPlugin
+  );
+
+
+pluginConsent
+  .addEventListener(
+    "click",
+    event => {
+
+      if (
+        event.target ===
+        pluginConsent
+      ) {
+
+        closePluginConsent();
+
+      }
+
+    }
+  );
 
 
 renderSidebarRepositories();
