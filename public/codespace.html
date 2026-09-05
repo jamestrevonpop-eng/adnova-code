@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1.0"
+  >
+
+  <title>Adnova Code — Codespace</title>
+
+  <link
+    rel="stylesheet"
+    href="/css/app.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="/css/codespace.css"
+  >
+</head>
+
+<body>
+
+<div class="codespace-shell">
+
+  <header class="codespace-topbar">
+
+    <div class="workspace-identity">
+
+      <button
+        id="workspace-back"
+        class="workspace-back"
+      >
+        ‹
+      </button>
+
+      <div>
+        <strong id="workspace-repository">
+          Repository
+        </strong>
+
+        <span id="workspace-branch">
+          main
+        </span>
+      </div>
+
+    </div>
+
+
+    <div class="workspace-actions">
+
+      <button
+        id="preview-button"
+        class="workspace-button"
+      >
+        Preview
+      </button>
+
+      <button
+        id="ai-button"
+        class="workspace-button"
+      >
+        Coding AI
+      </button>
+
+      <button
+        id="snapshot-button"
+        class="workspace-button"
+      >
+        Snapshot
+      </button>
+
+      <button
+        id="save-button"
+        class="workspace-primary"
+      >
+        Save
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <main class="workspace-main">
+
+    <aside class="workspace-explorer">
+
+      <div class="panel-heading">
+        Explorer
+      </div>
+
+      <div
+        id="workspace-path"
+        class="panel-subheading"
+      >
+        /projects
+      </div>
+
+      <div
+        id="file-tree"
+        class="file-tree"
+      >
+      </div>
+
+      <div class="explorer-actions">
+
+        <button id="new-file">
+          + File
+        </button>
+
+        <button id="new-folder">
+          + Folder
+        </button>
+
+      </div>
+
+    </aside>
+
+
+    <section class="workspace-editor">
+
+      <div class="editor-tabs">
+
+        <div
+          id="editor-tab"
+          class="editor-tab active"
+        >
+          <span id="editor-name">
+            Welcome
+          </span>
+
+          <span
+            id="editor-status"
+            class="editor-status"
+          >
+            Saved
+          </span>
+
+        </div>
+
+      </div>
+
+      <textarea
+        id="editor"
+        class="editor"
+        spellcheck="false"
+      ></textarea>
+
+    </section>
+
+
+    <aside
+      id="ai-panel"
+      class="ai-panel hidden-panel"
+    >
+
+      <div class="ai-panel-header">
+
+        <div>
+          <strong>
+            Adnova Coding
+          </strong>
+
+          <span>
+            Coding assistant
+          </span>
+        </div>
+
+        <button id="close-ai">
+          ×
+        </button>
+
+      </div>
+
+
+      <div
+        id="ai-messages"
+        class="ai-messages"
+      >
+
+        <div class="ai-message">
+          Ask Adnova Coding to build,
+          explain or debug something.
+        </div>
+
+      </div>
+
+
+      <div class="ai-composer">
+
+        <textarea
+          id="ai-input"
+          rows="3"
+          placeholder="Ask Adnova Coding..."
+        ></textarea>
+
+        <button id="ai-send">
+          ↑
+        </button>
+
+      </div>
+
+    </aside>
+
+  </main>
+
+
+  <section class="terminal-area">
+
+    <div class="terminal-tabs">
+
+      <div
+        id="terminal-tabs"
+        class="terminal-tab-list"
+      ></div>
+
+      <button
+        id="new-terminal"
+        class="terminal-add"
+      >
+        ＋
+      </button>
+
+    </div>
+
+
+    <div class="terminal-toolbar">
+
+      <button
+        class="terminal-panel active"
+        data-terminal-panel="terminal"
+      >
+        Terminal
+      </button>
+
+      <button
+        class="terminal-panel"
+        data-terminal-panel="ports"
+      >
+        Ports
+      </button>
+
+      <button
+        class="terminal-panel"
+        data-terminal-panel="debug"
+      >
+        Debug Console
+      </button>
+
+      <button
+        class="terminal-panel"
+        data-terminal-panel="output"
+      >
+        Output
+      </button>
+
+      <button
+        class="terminal-panel"
+        data-terminal-panel="problems"
+      >
+        Problems
+      </button>
+
+    </div>
+
+
+    <div
+      id="terminal-output"
+      class="terminal-output"
+    ></div>
+
+
+    <div
+      id="terminal-input-wrap"
+      class="terminal-input-wrap"
+    >
+
+      <span>›</span>
+
+      <input
+        id="terminal-input"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="/projects"
+      >
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<script src="/js/codespace.js"></script>
+
+</body>
+</html>

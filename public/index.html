@@ -2,128 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Adnova Code</title>
   <link rel="stylesheet" href="/css/app.css">
 </head>
 
 <body>
 
-<div id="app-shell" class="app-shell">
+<div class="app-shell">
 
   <aside class="sidebar">
 
-    <div class="sidebar-brand">
+    <div class="brand">
       <div class="brand-icon">A</div>
-
-      <div class="brand-text">
+      <div>
         <strong>Adnova</strong>
         <span>Code</span>
       </div>
     </div>
 
-
     <button class="profile-button" id="profile-button">
-
       <div class="avatar">H</div>
 
       <div class="profile-copy">
-
-        <strong>
-          Your Profile
-        </strong>
-
-        <span>
-          @you
-        </span>
-
+        <strong>Your Profile</strong>
+        <span>@you</span>
       </div>
 
-      <span class="chevron">
-        ›
-      </span>
-
+      <span class="chevron">›</span>
     </button>
 
-
     <button
-      class="create-button"
       id="create-repository-button"
+      class="create-button"
     >
       <span>＋</span>
       <span>New repository</span>
     </button>
 
-
     <nav class="sidebar-nav">
 
-      <button
-        class="nav-link active"
-        data-page="home"
-      >
-        <span class="nav-icon">⌂</span>
+      <button class="nav-link active" data-page="home">
+        <span>⌂</span>
         <span>Home</span>
       </button>
 
-
-      <button
-        class="nav-link"
-        data-page="repositories"
-      >
-        <span class="nav-icon">▣</span>
+      <button class="nav-link" data-page="repositories">
+        <span>▣</span>
         <span>Repositories</span>
       </button>
 
-
-      <button
-        class="nav-link"
-        data-page="codespaces"
-      >
-        <span class="nav-icon">▤</span>
+      <button class="nav-link" data-page="codespaces">
+        <span>▤</span>
         <span>Codespaces</span>
       </button>
 
-
-      <button
-        class="nav-link"
-        data-page="branches"
-      >
-        <span class="nav-icon">⑂</span>
+      <button class="nav-link" data-page="branches">
+        <span>⑂</span>
         <span>Branches</span>
       </button>
 
     </nav>
 
-
     <div class="sidebar-label">
       YOUR REPOSITORIES
     </div>
 
-
     <div
-      id="sidebar-repositories"
-      class="sidebar-repositories"
+      id="repository-list"
+      class="repository-list"
     ></div>
-
 
     <div class="sidebar-spacer"></div>
 
-
-    <button
-      class="nav-link"
-      data-page="settings"
-    >
-      <span class="nav-icon">⚙</span>
+    <button class="nav-link" data-page="settings">
+      <span>⚙</span>
       <span>Settings</span>
     </button>
 
-
-    <button
-      class="nav-link"
-      data-page="plugins"
-    >
-      <span class="nav-icon">◇</span>
+    <button class="nav-link" data-page="plugins">
+      <span>◇</span>
       <span>Plugins</span>
     </button>
 
@@ -137,33 +95,28 @@
       <div class="topbar-left">
 
         <button
-          class="mobile-menu-button"
           id="mobile-menu-button"
+          class="mobile-menu-button"
         >
           ☰
         </button>
 
-        <div
-          id="breadcrumb"
-          class="breadcrumb"
-        >
+        <div id="breadcrumb">
           Home
         </div>
 
       </div>
 
-
       <div class="topbar-right">
 
-        <div class="connection-status">
-          <span class="status-dot"></span>
+        <div class="connection">
+          <span></span>
           Adnova Code
         </div>
 
-
         <button
+          id="top-profile-button"
           class="top-avatar"
-          id="top-avatar-button"
         >
           H
         </button>
@@ -173,10 +126,7 @@
     </header>
 
 
-    <main
-      id="page-root"
-      class="page-root"
-    ></main>
+    <section id="page-root" class="page-root"></section>
 
   </main>
 
@@ -193,7 +143,6 @@
     <div class="modal-header">
 
       <div>
-
         <div class="modal-label">
           NEW REPOSITORY
         </div>
@@ -201,9 +150,7 @@
         <h2>
           Create repository
         </h2>
-
       </div>
-
 
       <button
         id="close-modal"
@@ -214,62 +161,39 @@
 
     </div>
 
-
-    <label class="form-field">
-
-      <span>
-        Repository name
-      </span>
+    <label class="field">
+      <span>Repository name</span>
 
       <input
         id="repository-name"
-        placeholder="my-project"
         autocomplete="off"
+        placeholder="my-project"
       >
-
     </label>
 
-
-    <label class="form-field">
-
-      <span>
-        Description
-      </span>
+    <label class="field">
+      <span>Description</span>
 
       <input
         id="repository-description"
-        placeholder="What are you building?"
         autocomplete="off"
+        placeholder="What are you building?"
       >
-
     </label>
 
-
-    <label class="checkbox-field">
-
+    <label class="check-field">
       <input
         id="repository-readme"
         type="checkbox"
         checked
       >
-
-      <span>
-        Add a README
-      </span>
-
+      <span>Add a README</span>
     </label>
 
+    <label class="field">
+      <span>Visibility</span>
 
-    <label class="form-field">
-
-      <span>
-        Visibility
-      </span>
-
-      <select
-        id="repository-visibility"
-      >
-
+      <select id="repository-visibility">
         <option value="public">
           Public
         </option>
@@ -277,259 +201,20 @@
         <option value="private">
           Private
         </option>
-
       </select>
-
     </label>
 
-
-    <div class="visibility-info">
-
-      Public repositories can be viewed by anyone.
-      Private repositories remain private.
-
+    <div class="modal-info">
+      Public repositories can be viewed by others.
+      Private repositories stay private.
     </div>
-
 
     <button
       id="create-repository-confirm"
-      class="modal-primary-button"
+      class="modal-primary"
     >
       Create repository
     </button>
-
-  </div>
-
-</div>
-
-
-<div
-  id="plugin-consent"
-  class="plugin-consent hidden"
->
-
-  <div class="plugin-consent-card">
-
-    <div class="plugin-consent-header">
-
-      <div>
-
-        <div class="plugin-consent-label">
-          PLUGIN CONNECTION
-        </div>
-
-        <h2>
-          Connect Adnova Coding
-        </h2>
-
-      </div>
-
-
-      <button
-        class="close-modal"
-        id="close-plugin-consent"
-      >
-        ×
-      </button>
-
-    </div>
-
-
-    <div class="plugin-identity">
-
-      <div class="plugin-large-icon">
-        A
-      </div>
-
-      <div>
-
-        <strong>
-          Adnova Coding
-        </strong>
-
-        <span>
-          Adnova AI ↔ Adnova Code
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <p class="plugin-consent-description">
-      Choose what Adnova AI is allowed to do
-      inside your Adnova Code workspace.
-    </p>
-
-
-    <div class="permission-list">
-
-      <label class="permission">
-
-        <input
-          type="checkbox"
-          data-permission="observe"
-          checked
-          disabled
-        >
-
-        <span class="permission-copy">
-
-          <strong>
-            Observe code
-          </strong>
-
-          <small>
-            Read files and inspect project context.
-          </small>
-
-        </span>
-
-        <span class="required-pill">
-          Required
-        </span>
-
-      </label>
-
-
-      <label class="permission">
-
-        <input
-          type="checkbox"
-          data-permission="edit"
-        >
-
-        <span class="permission-copy">
-
-          <strong>
-            Change code
-          </strong>
-
-          <small>
-            Modify existing project files.
-          </small>
-
-        </span>
-
-      </label>
-
-
-      <label class="permission">
-
-        <input
-          type="checkbox"
-          data-permission="create"
-        >
-
-        <span class="permission-copy">
-
-          <strong>
-            Create files
-          </strong>
-
-          <small>
-            Add new files and folders.
-          </small>
-
-        </span>
-
-      </label>
-
-
-      <label class="permission">
-
-        <input
-          type="checkbox"
-          data-permission="terminal"
-        >
-
-        <span class="permission-copy">
-
-          <strong>
-            Use terminal
-          </strong>
-
-          <small>
-            Run approved terminal commands.
-          </small>
-
-        </span>
-
-      </label>
-
-
-      <label class="permission">
-
-        <input
-          type="checkbox"
-          data-permission="branches"
-        >
-
-        <span class="permission-copy">
-
-          <strong>
-            Manage branches
-          </strong>
-
-          <small>
-            Create and work with project branches.
-          </small>
-
-        </span>
-
-      </label>
-
-
-      <label class="permission">
-
-        <input
-          type="checkbox"
-          data-permission="snapshots"
-        >
-
-        <span class="permission-copy">
-
-          <strong>
-            Manage snapshots
-          </strong>
-
-          <small>
-            Create and restore workspace snapshots.
-          </small>
-
-        </span>
-
-      </label>
-
-    </div>
-
-
-    <div class="plugin-consent-warning">
-
-      You can change these permissions later
-      from Plugin management.
-
-    </div>
-
-
-    <div class="plugin-consent-actions">
-
-      <button
-        class="secondary-button"
-        id="cancel-plugin-consent"
-      >
-        Cancel
-      </button>
-
-
-      <button
-        class="primary-button"
-        id="allow-plugin"
-      >
-        Allow access
-      </button>
-
-    </div>
 
   </div>
 
